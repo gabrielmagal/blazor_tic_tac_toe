@@ -6,4 +6,3 @@
 
 ![2](https://i.imgur.com/Qh0Nz8h.png)
 ![3](https://i.imgur.com/ZWb1jWf.png)
-![4](https://i.imgur.com/ECi3xKS.png)
