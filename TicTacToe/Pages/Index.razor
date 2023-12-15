@@ -1,0 +1,137 @@
+﻿@page "/"
+
+<PageTitle>Index</PageTitle>
+
+<div class="container text-center">
+    <button @onclick="() => StartGame()" class="btn btn-success mt-3">Start Game!</button>
+    <button @onclick="() => ResetGame()" class="btn btn-danger mt-3">Reset Game!</button>
+
+    @if (bStartGame)
+    {
+        <div class="game-board mt-4">
+            <button @onclick="() => SetPos(1)" type="button" class="button-game btn btn-primary">@board[1]</button>
+            <button @onclick="() => SetPos(2)" type="button" class="button-game btn btn-primary">@board[2]</button>
+            <button @onclick="() => SetPos(3)" type="button" class="button-game btn btn-primary">@board[3]</button>
+            <br />
+            <button @onclick="() => SetPos(4)" type="button" class="button-game btn btn-primary">@board[4]</button>
+            <button @onclick="() => SetPos(5)" type="button" class="button-game btn btn-primary">@board[5]</button>
+            <button @onclick="() => SetPos(6)" type="button" class="button-game btn btn-primary">@board[6]</button>
+            <br />
+            <button @onclick="() => SetPos(7)" type="button" class="button-game btn btn-primary">@board[7]</button>
+            <button @onclick="() => SetPos(8)" type="button" class="button-game btn btn-primary">@board[8]</button>
+            <button @onclick="() => SetPos(9)" type="button" class="button-game btn btn-primary">@board[9]</button>
+        </div>
+
+        <div class="mt-4">
+            <h4>Result: @GetGameResultMessage()</h4>
+            <div class="row justify-content-center">
+                <div class="col-md-6">
+                    <h5>Player X</h5>
+                    <p>Punctuation: @scoreX</p>
+                </div>
+                <div class="col-md-6">
+                    <h5>Player O</h5>
+                    <p>Punctuation: @scoreO</p>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+@code {
+    public bool bStartGame = false;
+    public string[] board = new string[10];
+    public bool playerIndex = false;
+    private string[] possibilities = new string[] { "123", "456", "789", "147", "258", "369", "159", "357" };
+    private string[] playerMoves = new string[2];
+    private bool endGame = false;
+    private int plays = 0;
+
+    private int scoreX = 0;
+    private int scoreO = 0;
+
+    public void StartGame()
+    {
+        playerMoves = new string[2];
+        board = new string[10];
+        playerIndex = false;
+        plays = 0;
+        endGame = false;
+        bStartGame = true;
+    }
+
+    public void ResetGame()
+    {
+        playerMoves = new string[2];
+        board = new string[10];
+        playerIndex = false;
+        plays = 0;
+        endGame = false;
+        scoreX = 0;
+        scoreO = 0;
+    }
+
+    public void SetPos(int xy)
+    {
+        if (!endGame && string.IsNullOrEmpty(board[xy]))
+        {
+            plays++;
+            if (playerIndex)
+            {
+                board[xy] = "X";
+                playerMoves[0] += xy;
+                playerMoves[0] = new string(playerMoves[0].OrderBy(c => c).ToArray());
+                if (CheckWinner(0))
+                {
+                    endGame = true;
+                    scoreX++;
+                    return;
+                }
+            }
+            else
+            {
+                board[xy] = "O";
+                playerMoves[1] += xy;
+                playerMoves[1] = new string(playerMoves[1].OrderBy(c => c).ToArray());
+                if (CheckWinner(1))
+                {
+                    endGame = true;
+                    scoreO++;
+                    return;
+                }
+            }
+
+            playerIndex = !playerIndex;
+
+            if (plays == 9)
+            {
+                endGame = true;
+                return;
+            }
+        }
+    }
+
+    public bool CheckWinner(int player)
+    {
+        foreach (var possibility in possibilities)
+        {
+            if (possibility.All(p => playerMoves[player].Contains(p)))
+                return true;
+        }
+        return false;
+    }
+
+    public string GetGameResultMessage()
+    {
+        if (endGame)
+        {
+            if (CheckWinner(0))
+                return "Player X winner!";
+            else if (CheckWinner(1))
+                return "Player O winner!";
+            else
+                return "Draw!";
+        }
+        return "";
+    }
+}
